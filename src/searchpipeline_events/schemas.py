@@ -14,6 +14,7 @@ class EventType(str, Enum):
     # Pattern Matcher Events
     PATTERN_MATCH = "pattern_match"
     PATTERN_NO_MATCH = "pattern_no_match"
+    PATTERN_LOAD = "pattern_load"
     
     # Query Executor Events
     QUERY_EXECUTION = "query_execution"
@@ -66,6 +67,14 @@ class PatternNoMatchData(BaseEventData):
     """Data for pattern no match events"""
     query: str = Field(..., min_length=1)
     attempted_patterns: List[str] = Field(..., min_length=1)
+
+
+class PatternLoadData(BaseEventData):
+    """Data for pattern load events"""
+    pattern_count: int = Field(..., ge=0)
+    version: str = Field(..., min_length=1)
+    load_duration_seconds: float = Field(..., ge=0.0)
+    validation_error_count: int = Field(..., ge=0)
 
 
 class QueryExecutionData(BaseEventData):
@@ -132,6 +141,7 @@ class BaseEvent(BaseModel):
     data: Union[
         PatternMatchData,
         PatternNoMatchData,
+        PatternLoadData,
         QueryExecutionData,
         QueryErrorData,
         QueryInterpretationData,
@@ -161,6 +171,7 @@ class BaseEvent(BaseModel):
         data_type_map = {
             EventType.PATTERN_MATCH: PatternMatchData,
             EventType.PATTERN_NO_MATCH: PatternNoMatchData,
+            EventType.PATTERN_LOAD: PatternLoadData,
             EventType.QUERY_EXECUTION: QueryExecutionData,
             EventType.QUERY_ERROR: QueryErrorData,
             EventType.QUERY_INTERPRETATION: QueryInterpretationData,
@@ -362,6 +373,7 @@ def generate_event_schemas() -> Dict[str, Any]:
         "data_schemas": {
             "pattern_match": PatternMatchData.schema(),
             "pattern_no_match": PatternNoMatchData.schema(),
+            "pattern_load": PatternLoadData.schema(),
             "query_execution": QueryExecutionData.schema(),
             "query_error": QueryErrorData.schema(),
             "query_interpretation": QueryInterpretationData.schema(),
