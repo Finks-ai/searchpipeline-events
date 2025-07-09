@@ -35,6 +35,17 @@ class PatternMatcherClient:
             processing_time_ms=processing_time_ms
         )
     
+    async def patterns_loaded(self, pattern_count: int, version: str, 
+                             load_duration_seconds: float, 
+                             validation_error_count: int = 0) -> bool:
+        """Log when patterns are loaded"""
+        return await self.client.send_pattern_load(
+            pattern_count=pattern_count,
+            version=version,
+            load_duration_seconds=load_duration_seconds,
+            validation_error_count=validation_error_count
+        )
+    
     async def close(self):
         """Close the client"""
         await self.client.close()

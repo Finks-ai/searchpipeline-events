@@ -24,6 +24,7 @@ from .schemas import (
     # Event data classes
     PatternMatchData,
     PatternNoMatchData,
+    PatternLoadData,
     QueryExecutionData,
     QueryErrorData,
     QueryInterpretationData,
@@ -34,12 +35,22 @@ from .schemas import (
     # Event creation functions
     create_pattern_match_event,
     create_pattern_no_match_event,
+    create_pattern_load_event,
     create_query_execution_event,
     create_query_error_event,
     create_query_interpretation_event,
     create_search_request_event,
     create_rate_limit_hit_event,
     create_error_event,
+)
+
+from .data_collection_client import (
+    DataCollectionClient,
+    PatternMatcherEventClient,
+    QueryExecutorEventClient,
+    SearchGatewayEventClient,
+    GenericEventClient,
+    create_event_clients,
 )
 
 __version__ = "0.1.0"
@@ -69,6 +80,7 @@ __all__ = [
     "ServiceName",
     "PatternMatchData",
     "PatternNoMatchData",
+    "PatternLoadData",
     "QueryExecutionData",
     "QueryErrorData",
     "QueryInterpretationData",
@@ -80,10 +92,19 @@ __all__ = [
     # Event creation
     "create_pattern_match_event",
     "create_pattern_no_match_event",
+    "create_pattern_load_event",
     "create_query_execution_event",
     "create_query_error_event",
     "create_query_interpretation_event",
     "create_search_request_event",
     "create_rate_limit_hit_event",
     "create_error_event",
+    
+    # New centralized data collection clients
+    "DataCollectionClient",
+    "PatternMatcherEventClient",
+    "QueryExecutorEventClient",
+    "SearchGatewayEventClient",
+    "GenericEventClient",
+    "create_event_clients",
 ]

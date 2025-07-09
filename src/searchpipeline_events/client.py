@@ -201,6 +201,25 @@ class EventClient:
         )
         return await self.send_event(event)
     
+    async def send_pattern_load(
+        self,
+        pattern_count: int,
+        version: str,
+        load_duration_seconds: float,
+        validation_error_count: int = 0
+    ) -> bool:
+        """Send a pattern load event"""
+        from .schemas import create_pattern_load_event
+        
+        event = create_pattern_load_event(
+            service=self.service_name,
+            pattern_count=pattern_count,
+            version=version,
+            load_duration_seconds=load_duration_seconds,
+            validation_error_count=validation_error_count
+        )
+        return await self.send_event(event)
+    
     async def send_query_execution(
         self,
         query: str,

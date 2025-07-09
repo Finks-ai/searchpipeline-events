@@ -237,6 +237,26 @@ def create_pattern_no_match_event(
     )
 
 
+def create_pattern_load_event(
+    service: ServiceName,
+    pattern_count: int,
+    version: str,
+    load_duration_seconds: float,
+    validation_error_count: int = 0
+) -> BaseEvent:
+    """Create a pattern load event"""
+    return BaseEvent(
+        event=EventType.PATTERN_LOAD,
+        service=service,
+        data=PatternLoadData(
+            pattern_count=pattern_count,
+            version=version,
+            load_duration_seconds=load_duration_seconds,
+            validation_error_count=validation_error_count
+        )
+    )
+
+
 def create_query_execution_event(
     service: ServiceName,
     query: str,
