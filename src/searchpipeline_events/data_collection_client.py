@@ -108,7 +108,9 @@ class PatternMatcherEventClient:
         pattern: str,
         confidence: float,
         match_type: str = "exact",
-        processing_time_ms: Optional[int] = None
+        processing_time_ms: Optional[int] = None,
+        confidence_threshold: Optional[float] = None,
+        closest_matches: Optional[list] = None
     ) -> bool:
         """Log a successful pattern match."""
         event = BaseEvent(
@@ -119,7 +121,9 @@ class PatternMatcherEventClient:
                 pattern=pattern,
                 confidence=confidence,
                 match_type=match_type,
-                processing_time_ms=processing_time_ms
+                processing_time_ms=processing_time_ms,
+                confidence_threshold=confidence_threshold,
+                closest_matches=closest_matches or []
             )
         )
         return await self.client.send_event(event)
@@ -128,7 +132,9 @@ class PatternMatcherEventClient:
         self,
         query: str,
         attempted_patterns: list = None,
-        processing_time_ms: Optional[int] = None
+        processing_time_ms: Optional[int] = None,
+        confidence_threshold: Optional[float] = None,
+        closest_matches: Optional[list] = None
     ) -> bool:
         """Log a failed pattern match."""
         event = BaseEvent(
@@ -137,7 +143,9 @@ class PatternMatcherEventClient:
             data=PatternNoMatchData(
                 query=query,
                 attempted_patterns=attempted_patterns or [],
-                processing_time_ms=processing_time_ms
+                processing_time_ms=processing_time_ms,
+                confidence_threshold=confidence_threshold,
+                closest_matches=closest_matches or []
             )
         )
         return await self.client.send_event(event)

@@ -61,12 +61,16 @@ class PatternMatchData(BaseEventData):
     pattern: str = Field(..., min_length=1)
     confidence: float = Field(..., ge=0.0, le=1.0)
     match_type: str = Field(..., pattern="^(exact|fuzzy|semantic)$")
+    confidence_threshold: Optional[float] = Field(None, ge=0.0, le=1.0)
+    closest_matches: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
 
 class PatternNoMatchData(BaseEventData):
     """Data for pattern no match events"""
     query: str = Field(..., min_length=1)
     attempted_patterns: List[str] = Field(default_factory=list)
+    confidence_threshold: Optional[float] = Field(None, ge=0.0, le=1.0)
+    closest_matches: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
 
 class PatternLoadData(BaseEventData):
@@ -203,7 +207,9 @@ def create_pattern_match_event(
     pattern: str,
     confidence: float,
     match_type: str,
-    processing_time_ms: Optional[int] = None
+    processing_time_ms: Optional[int] = None,
+    confidence_threshold: Optional[float] = None,
+    closest_matches: Optional[List[Dict[str, Any]]] = None
 ) -> BaseEvent:
     """Create a pattern match event"""
     return BaseEvent(
@@ -214,7 +220,9 @@ def create_pattern_match_event(
             pattern=pattern,
             confidence=confidence,
             match_type=match_type,
-            processing_time_ms=processing_time_ms
+            processing_time_ms=processing_time_ms,
+            confidence_threshold=confidence_threshold,
+            closest_matches=closest_matches or []
         )
     )
 
@@ -223,7 +231,9 @@ def create_pattern_no_match_event(
     service: ServiceName,
     query: str,
     attempted_patterns: List[str],
-    processing_time_ms: Optional[int] = None
+    processing_time_ms: Optional[int] = None,
+    confidence_threshold: Optional[float] = None,
+    closest_matches: Optional[List[Dict[str, Any]]] = None
 ) -> BaseEvent:
     """Create a pattern no match event"""
     return BaseEvent(
@@ -232,7 +242,9 @@ def create_pattern_no_match_event(
         data=PatternNoMatchData(
             query=query,
             attempted_patterns=attempted_patterns,
-            processing_time_ms=processing_time_ms
+            processing_time_ms=processing_time_ms,
+            confidence_threshold=confidence_threshold,
+            closest_matches=closest_matches or []
         )
     )
 
