@@ -131,7 +131,6 @@ class PatternMatcherEventClient:
     async def log_pattern_no_match(
         self,
         query: str,
-        attempted_patterns: list = None,
         processing_time_ms: Optional[int] = None,
         confidence_threshold: Optional[float] = None,
         closest_matches: Optional[list] = None
@@ -142,7 +141,6 @@ class PatternMatcherEventClient:
             service=ServiceName.PATTERN_MATCHER,
             data=PatternNoMatchData(
                 query=query,
-                attempted_patterns=attempted_patterns or [],
                 processing_time_ms=processing_time_ms,
                 confidence_threshold=confidence_threshold,
                 closest_matches=closest_matches or []
@@ -188,7 +186,6 @@ class PatternMatcherEventClient:
         elif event_type == "pattern_match_failure":
             return await self.log_pattern_no_match(
                 query=event_data.get("query", ""),
-                attempted_patterns=[],
                 processing_time_ms=int(event_data.get("match_time_ms", 0))
             )
         else:

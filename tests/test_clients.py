@@ -66,14 +66,12 @@ class TestPatternMatcherClient:
         
         result = await client.pattern_not_found(
             query="random query",
-            attempted_patterns=["financial_data", "company_info"],
             processing_time_ms=30
         )
         
         assert result is True
         mock_send.assert_called_once_with(
             query="random query",
-            attempted_patterns=["financial_data", "company_info"],
             processing_time_ms=30
         )
         

@@ -26,12 +26,10 @@ class PatternMatcherClient:
             processing_time_ms=processing_time_ms
         )
     
-    async def pattern_not_found(self, query: str, attempted_patterns: List[str], 
-                               processing_time_ms: int) -> bool:
+    async def pattern_not_found(self, query: str, processing_time_ms: int) -> bool:
         """Log when no pattern is matched"""
         return await self.client.send_pattern_no_match(
             query=query,
-            attempted_patterns=attempted_patterns,
             processing_time_ms=processing_time_ms
         )
     

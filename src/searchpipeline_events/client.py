@@ -189,14 +189,12 @@ class EventClient:
     async def send_pattern_no_match(
         self,
         query: str,
-        attempted_patterns: List[str],
         processing_time_ms: Optional[int] = None
     ) -> bool:
         """Send a pattern no match event"""
         event = create_pattern_no_match_event(
             service=self.service_name,
             query=query,
-            attempted_patterns=attempted_patterns,
             processing_time_ms=processing_time_ms
         )
         return await self.send_event(event)

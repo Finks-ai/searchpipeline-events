@@ -45,7 +45,7 @@ from searchpipeline_events.clients import PatternMatcherClient, QueryExecutorCli
 # Pattern matcher
 async with PatternMatcherClient(api_url) as client:
     await client.pattern_found(query, pattern, confidence, match_type, processing_time_ms)
-    await client.pattern_not_found(query, attempted_patterns, processing_time_ms)
+    await client.pattern_not_found(query, processing_time_ms)
 
 # Query executor
 async with QueryExecutorClient(api_url) as client:

@@ -68,7 +68,6 @@ class PatternMatchData(BaseEventData):
 class PatternNoMatchData(BaseEventData):
     """Data for pattern no match events"""
     query: str = Field(..., min_length=1)
-    attempted_patterns: List[str] = Field(default_factory=list)
     confidence_threshold: Optional[float] = Field(None, ge=0.0, le=1.0)
     closest_matches: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
@@ -230,7 +229,6 @@ def create_pattern_match_event(
 def create_pattern_no_match_event(
     service: ServiceName,
     query: str,
-    attempted_patterns: List[str],
     processing_time_ms: Optional[int] = None,
     confidence_threshold: Optional[float] = None,
     closest_matches: Optional[List[Dict[str, Any]]] = None
@@ -241,7 +239,6 @@ def create_pattern_no_match_event(
         service=service,
         data=PatternNoMatchData(
             query=query,
-            attempted_patterns=attempted_patterns,
             processing_time_ms=processing_time_ms,
             confidence_threshold=confidence_threshold,
             closest_matches=closest_matches or []

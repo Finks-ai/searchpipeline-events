@@ -25,7 +25,6 @@ async def example_service_client():
         # Pattern not found
         await client.pattern_not_found(
             query="random query",
-            attempted_patterns=["financial_data", "company_info", "market_data"],
             processing_time_ms=30
         )
 
@@ -135,7 +134,6 @@ class PatternMatcher:
             # No pattern found
             await self.event_client.pattern_not_found(
                 query=query,
-                attempted_patterns=list(self.patterns.keys()),
                 processing_time_ms=processing_time_ms
             )
             
