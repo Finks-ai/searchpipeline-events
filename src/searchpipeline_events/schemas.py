@@ -66,7 +66,7 @@ class PatternMatchData(BaseEventData):
 class PatternNoMatchData(BaseEventData):
     """Data for pattern no match events"""
     query: str = Field(..., min_length=1)
-    attempted_patterns: List[str] = Field(..., min_length=1)
+    attempted_patterns: List[str] = Field(default_factory=list)
 
 
 class PatternLoadData(BaseEventData):
