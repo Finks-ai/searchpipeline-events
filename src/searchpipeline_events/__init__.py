@@ -36,7 +36,9 @@ from .schemas import (
     create_pattern_no_match_event,
     create_query_execution_event,
     create_query_error_event,
+    create_query_interpretation_event,
     create_search_request_event,
+    create_rate_limit_hit_event,
     create_error_event,
 )
 
@@ -80,6 +82,8 @@ __all__ = [
     "create_pattern_no_match_event",
     "create_query_execution_event",
     "create_query_error_event",
+    "create_query_interpretation_event",
     "create_search_request_event",
+    "create_rate_limit_hit_event",
     "create_error_event",
 ]

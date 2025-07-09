@@ -3,7 +3,7 @@ name = "searchpipeline-events"
 version = "0.1.0"
 description = "Standardized event schemas and client for the search pipeline"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.0.0",
     "httpx>=0.25.0",
@@ -13,6 +13,8 @@ dependencies = [
 dev = [
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
     "mypy>=1.5.0",
@@ -48,3 +50,19 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 check_untyped_defs = true
 namespace_packages = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+asyncio_mode = "auto"
+addopts = "-v --tb=short --cov=src/searchpipeline_events --cov-report=term-missing --cov-report=html"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+]

@@ -3,10 +3,10 @@ Event schemas for the search pipeline data collection service.
 This module defines standardized event structures using Pydantic models.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 
 class EventType(str, Enum):
@@ -44,13 +44,14 @@ class ServiceName(str, Enum):
 
 class BaseEventData(BaseModel):
     """Base class for all event data"""
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     processing_time_ms: Optional[int] = Field(None, ge=0)
     
-    class Config:
-        json_encoders = {
+    model_config = ConfigDict(
+        json_encoders={
             datetime: lambda v: v.isoformat()
         }
+    )
 
 
 class PatternMatchData(BaseEventData):
@@ -58,13 +59,13 @@ class PatternMatchData(BaseEventData):
     query: str = Field(..., min_length=1)
     pattern: str = Field(..., min_length=1)
     confidence: float = Field(..., ge=0.0, le=1.0)
-    match_type: str = Field(..., regex="^(exact|fuzzy|semantic)$")
+    match_type: str = Field(..., pattern="^(exact|fuzzy|semantic)$")
 
 
 class PatternNoMatchData(BaseEventData):
     """Data for pattern no match events"""
     query: str = Field(..., min_length=1)
-    attempted_patterns: List[str] = Field(..., min_items=1)
+    attempted_patterns: List[str] = Field(..., min_length=1)
 
 
 class QueryExecutionData(BaseEventData):
@@ -79,7 +80,7 @@ class QueryExecutionData(BaseEventData):
 class QueryErrorData(BaseEventData):
     """Data for query execution error events"""
     query: str = Field(..., min_length=1)
-    error_type: str = Field(..., regex="^(timeout|connection|validation|unknown)$")
+    error_type: str = Field(..., pattern="^(timeout|connection|validation|unknown)$")
     error_message: str = Field(..., min_length=1)
     execution_time_ms: int = Field(..., ge=0)
 
@@ -141,13 +142,22 @@ class BaseEvent(BaseModel):
         Dict[str, Any]  # Fallback for custom data
     ]
     
-    @validator('data')
-    def validate_data_type(cls, v, values):
+    @field_validator('data', mode='before')
+    @classmethod
+    def validate_data_type(cls, v, info):
         """Validate that data matches the event type"""
-        if 'event' not in values:
+        # For Pydantic v2, we need to check context differently
+        if not hasattr(info, 'context') or not info.context:
             return v
             
-        event_type = values['event']
+        # Try to get event type from context or field values
+        event_type = None
+        if hasattr(info, 'data') and info.data and 'event' in info.data:
+            event_type = info.data['event']
+        
+        if not event_type:
+            return v
+            
         data_type_map = {
             EventType.PATTERN_MATCH: PatternMatchData,
             EventType.PATTERN_NO_MATCH: PatternNoMatchData,
@@ -276,6 +286,48 @@ def create_search_request_event(
             session_id=session_id,
             ip_address=ip_address,
             user_agent=user_agent
+        )
+    )
+
+
+def create_query_interpretation_event(
+    service: ServiceName,
+    original_query: str,
+    interpreted_query: str,
+    interpretation_confidence: float,
+    processing_time_ms: Optional[int] = None
+) -> BaseEvent:
+    """Create a query interpretation event"""
+    return BaseEvent(
+        event=EventType.QUERY_INTERPRETATION,
+        service=service,
+        data=QueryInterpretationData(
+            original_query=original_query,
+            interpreted_query=interpreted_query,
+            interpretation_confidence=interpretation_confidence,
+            processing_time_ms=processing_time_ms
+        )
+    )
+
+
+def create_rate_limit_hit_event(
+    service: ServiceName,
+    user_id: Optional[str] = None,
+    ip_address: Optional[str] = None,
+    limit_type: str = "requests_per_minute",
+    current_count: int = 0,
+    limit: int = 60
+) -> BaseEvent:
+    """Create a rate limit hit event"""
+    return BaseEvent(
+        event=EventType.RATE_LIMIT_HIT,
+        service=service,
+        data=RateLimitHitData(
+            user_id=user_id,
+            ip_address=ip_address,
+            limit_type=limit_type,
+            current_count=current_count,
+            limit=limit
         )
     )
 

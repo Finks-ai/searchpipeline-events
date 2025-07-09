@@ -75,7 +75,7 @@ class EventClient:
         """
         try:
             # Validate event
-            event_dict = event.dict()
+            event_dict = event.model_dump()
             
             # Send to API
             response = await self._send_with_retry(event_dict)
